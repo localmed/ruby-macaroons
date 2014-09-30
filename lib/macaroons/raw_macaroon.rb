@@ -31,7 +31,7 @@ module Macaroons
     end
 
     def create_initial_macaroon_signature(key, identifier)
-      derived_key = key_hmac(key='macaroons-key-generator', data=key)
+      derived_key = key_hmac('macaroons-key-generator', key)
       macaroon_hmac(derived_key, identifier)
     end
 
