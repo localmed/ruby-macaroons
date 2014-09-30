@@ -22,8 +22,4 @@ Or install it yourself as:
     location => The location at which the macaroon is created
 
     # Construct a Macaroon.
-    m = Macaroon.new(
-      key=key,
-      identifier=identifier,
-      location='http://google.com'
-    )
+    m = Macaroon.new(key, identifier, 'http://google.com')
