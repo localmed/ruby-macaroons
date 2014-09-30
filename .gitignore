@@ -15,6 +15,7 @@ Gemfile.lock
 /_yardoc/
 /doc/
 /rdoc/
+api.txt
 
 ## Environment normalisation:
 /.bundle/
