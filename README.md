@@ -14,3 +14,16 @@ And then execute:
 Or install it yourself as:
 
     $ gem install macaroons
+
+## Quickstart
+
+    key => Very secret key used to sign the macaroon
+    identifier => An identifier for the macaroon
+    location => The location at which the macaroon is created
+
+    # Construct a Macaroon.
+    m = Macaroon.new(
+      key=key,
+      identifier=identifier,
+      location='http://google.com'
+    )
