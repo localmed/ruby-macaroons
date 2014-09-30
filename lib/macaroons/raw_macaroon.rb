@@ -30,6 +30,8 @@ module Macaroons
       @caveats
     end
 
+    private
+
     def create_initial_macaroon_signature(key, identifier)
       derived_key = key_hmac('macaroons-key-generator', key)
       macaroon_hmac(derived_key, identifier)
@@ -44,8 +46,6 @@ module Macaroons
       digest = OpenSSL::Digest.new('sha256') if digest.nil?
       OpenSSL::HMAC.digest(digest, key, data)
     end
-
-    private :create_initial_macaroon_signature, :macaroon_hmac, :key_hmac
 
   end
 end
