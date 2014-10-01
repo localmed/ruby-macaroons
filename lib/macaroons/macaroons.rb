@@ -22,5 +22,9 @@ module Macaroons
       @raw_macaroon.caveats
     end
 
+    def add_first_party_caveat(predicate)
+      @raw_macaroon.add_first_party_caveat(predicate)
+    end
+
   end
 end
