@@ -23,3 +23,6 @@ Or install it yourself as:
 
     # Construct a Macaroon.
     m = Macaroon.new(key, identifier, 'http://google.com')
+
+    # Add a Caveat
+    m.add_first_party_caveat('caveat_1')

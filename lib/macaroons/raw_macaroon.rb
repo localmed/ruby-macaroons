@@ -1,8 +1,10 @@
 require 'openssl'
+require 'macaroons/caveat'
+require 'macaroons/utils'
 
 module Macaroons
   class RawMacaroon
-    def initialize(key, identifier, location)
+    def initialize(key, identifier, location=nil)
       @key = key
       @identifier = identifier
       @location = location
@@ -10,39 +12,29 @@ module Macaroons
       @caveats = []
     end
 
-    def key
-      @key
-    end
-
-    def identifier
-      @identifier
-    end
-
-    def location
-      @location
-    end
+    attr_reader :identifier
+    attr_reader :key
+    attr_reader :location
+    attr_reader :caveats
 
     def signature
-      @signature
+      Utils.hexlify(@signature).downcase
     end
 
-    def caveats
-      @caveats
+    def add_first_party_caveat(predicate)
+      caveat = Caveat.new(predicate)
+      @caveats << caveat
+      @signature = hmac(@signature, predicate)
     end
 
     private
 
     def create_initial_macaroon_signature(key, identifier)
-      derived_key = key_hmac('macaroons-key-generator', key)
-      macaroon_hmac(derived_key, identifier)
+      derived_key = hmac('macaroons-key-generator', key)
+      hmac(derived_key, identifier)
     end
 
-    def macaroon_hmac(key, data, digest=nil)
-      digest = OpenSSL::Digest.new('sha256') if digest.nil?
-      OpenSSL::HMAC.hexdigest(digest, key, data)
-    end
-
-    def key_hmac(key, data, digest=nil)
+    def hmac(key, data, digest=nil)
       digest = OpenSSL::Digest.new('sha256') if digest.nil?
       OpenSSL::HMAC.digest(digest, key, data)
     end
