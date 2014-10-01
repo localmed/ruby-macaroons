@@ -15,10 +15,10 @@ module Macaroons
     end
 
     def third_party?
-      verification_id.nil? ? false : true
+      !first_party?
     end
 
-    def to_json
+    def to_h
       {'cid' => @caveat_id, 'vid' => @verification_id, 'cl' => @caveat_location}
     end
 
