@@ -43,10 +43,19 @@ Inside of your Ruby program do:
     location => The location at which the macaroon is created
 
     # Construct a Macaroon.
-    m = Macaroon.new(key, identifier, 'http://google.com')
+    m = Macaroon.new(key, identifier, 'http://foo.com')
 
-    # Add a Caveat
+    # Add first party caveat
     m.add_first_party_caveat('caveat_1')
+
+    # List all first party caveats
+    m.first_party_caveats
+
+    # Add third party caveat
+    m.add_third_party_caveat('caveat_key', 'caveat_id', 'http://foo.com')
+
+    # List all third party caveats
+    m.third_party_caveats
 
 ## References
 

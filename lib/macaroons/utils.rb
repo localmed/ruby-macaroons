@@ -13,5 +13,16 @@ module Macaroons
       [value].pack('H*')
     end
 
+    def self.truncate_or_pad(string, size=nil)
+      size = size.nil? ? 32 : size
+      if string.length > size
+        string[0, size]
+      elsif string.length > size
+        string + '\0'*(size-string.length)
+      else
+        string
+      end
+    end
+
   end
 end
