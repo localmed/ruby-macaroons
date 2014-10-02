@@ -26,5 +26,17 @@ module Macaroons
       @raw_macaroon.add_first_party_caveat(predicate)
     end
 
+    def first_party_caveats
+      caveats.select(&:first_party?)
+    end
+
+    def add_third_party_caveat(caveat_key, caveat_id, caveat_location)
+      @raw_macaroon.add_third_party_caveat(caveat_key, caveat_id, caveat_location)
+    end
+
+    def third_party_caveats
+       caveats.select{|caveat| caveat.third_party?}
+    end
+
   end
 end
