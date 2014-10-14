@@ -10,11 +10,17 @@ module Macaroons
   class RawMacaroon
     PACKET_PREFIX_LENGTH = 4
 
-    def initialize(key, identifier, location=nil, serialized=nil)
+    def initialize(key: nil, identifier: nil, location: nil, serialized: nil)
+      if key.nil? && identifier.nil? && location.nil? && serialized.nil?
+        raise ArgumentError, 'Must provide either (key, id, location), or serialized.'
+      elsif (key.nil? || identifier.nil? || location.nil?) and serialized.nil?
+        raise ArgumentError, 'Must provide all three: (key, id, location)'
+      end
+
       @key = key
       @identifier = identifier
       @location = location
-      @signature = create_initial_macaroon_signature(key, identifier)
+      @signature = create_initial_macaroon_signature(key, identifier) unless serialized
       @caveats = []
       deserialize(serialized) unless serialized.nil?
     end
@@ -39,7 +45,7 @@ module Macaroons
       truncated_or_padded_signature = Utils.truncate_or_pad(@signature)
       box = RbNaCl::SimpleBox.from_secret_key(truncated_or_padded_signature)
       ciphertext = box.encrypt(derived_caveat_key)
-      verification_id = Base64.encode64(ciphertext)
+      verification_id = Base64.strict_encode64(ciphertext)
       caveat = Caveat.new(caveat_id, verification_id, caveat_location)
       @caveats << caveat
       sign_third_party_caveat(verification_id, caveat_id)
@@ -76,36 +82,27 @@ module Macaroons
 
       while index < decoded.length
         packet_length = decoded[index..(index + PACKET_PREFIX_LENGTH - 1)].to_i(16)
-        packet = decoded[index..(index + packet_length)]
+        packet = decoded[index + PACKET_PREFIX_LENGTH..(index + packet_length - 2)]
 
-        start_index = index + PACKET_PREFIX_LENGTH
-        end_index = index + packet_length - 2
-        if packet[PACKET_PREFIX_LENGTH..-1].start_with?('location')
-          @location = decoded[start_index + 'location '.length..end_index]
+        key, value = depacketize(packet)
+
+        case key
+        when 'location'
+          @location = value
+        when 'identifier'
+          @identifier = value
+        when 'cid'
+          @caveats << Caveat.new(value)
+        when 'vid'
+          @caveats[-1].verification_id = value
+        when 'cl'
+          @caveats[-1].caveat_location = value
+        when 'signature'
+          @signature = value
+        else
+          raise KeyError, 'Invalid key in binary macaroon. Macaroon may be corrupted.'
         end
 
-        if packet[PACKET_PREFIX_LENGTH..-1].start_with?('identifier')
-          @identifier = decoded[start_index + 'identifier '.length..end_index]
-        end
-
-        if packet[PACKET_PREFIX_LENGTH..-1].start_with?('cid')
-          cid = decoded[start_index + 'cid '.length..end_index]
-          @caveats << Caveat.new(cid)
-        end
-
-        if packet[PACKET_PREFIX_LENGTH..-1].start_with?('vid')
-          vid = decoded[start_index + 'vid '.length..end_index]
-          @caveats[-1].verification_id = vid
-        end
-
-        if packet[PACKET_PREFIX_LENGTH..-1].start_with?('cl')
-          cl = decoded[start_index + 'cl '.length..end_index]
-          @caveats[-1].caveat_location = cl
-        end
-
-        if packet[PACKET_PREFIX_LENGTH..-1].start_with?('signature')
-          @signature = decoded[start_index + 'signature '.length..end_index]
-        end
         index = index + packet_length
       end
     end
@@ -124,8 +121,13 @@ module Macaroons
       packet
     end
 
+    def depacketize(packet)
+      key = packet.split(" ")[0]
+      value = packet[key.length + 1..-1]
+      [key, value]
+    end
+
     def create_initial_macaroon_signature(key, identifier)
-      return nil if key.nil? or identifier.nil?
       derived_key = hmac('macaroons-key-generator', key)
       hmac(derived_key, identifier)
     end
