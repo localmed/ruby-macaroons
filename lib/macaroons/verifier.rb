@@ -1,3 +1,4 @@
+require 'macaroons/errors'
 
 module Macaroons
   class Verifier
@@ -21,7 +22,7 @@ module Macaroons
 
       verify_caveats(macaroon, compare_macaroon, discharge_macaroons)
 
-      raise StandardError, 'Signatures do not match.' unless signatures_match(macaroon.signature, compare_macaroon.signature)
+      raise SignatureMismatchError, 'Signatures do not match.' unless signatures_match(macaroon.signature, compare_macaroon.signature)
 
       return true
     end
@@ -35,7 +36,7 @@ module Macaroons
         else
           caveatMet = verify_third_party_caveat(caveat, compare_macaroon, discharge_macaroons)
         end
-        raise StandardError, "Caveat not met. Unable to satisfy: #{caveat.caveat_id}" unless caveatMet
+        raise CaveatUnsatisfiedError, "Caveat not met. Unable to satisfy: #{caveat.caveat_id}" unless caveatMet
       end
     end
 
@@ -44,7 +45,7 @@ module Macaroons
       if @predicates.include? caveat.caveat_id
         caveatMet = true
       else
-        for callback in @callbacks
+        @callbacks.each do |callback|
           caveatMet = true if callback(caveat.caveat_id)
         end
       end
@@ -55,7 +56,7 @@ module Macaroons
 
     def verify_third_party_caveat(caveat, compare_macaroon, discharge_macaroons)
       # TODO
-      return true
+      raise NotImplementedError
     end
 
     def signatures_match(a, b)
