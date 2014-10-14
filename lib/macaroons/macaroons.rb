@@ -2,8 +2,8 @@ require 'macaroons/raw_macaroon'
 
 module Macaroons
   class Macaroon
-    def initialize(key, identifier, location)
-      @raw_macaroon = RawMacaroon.new(key, identifier, location)
+    def initialize(key: nil, identifier: nil, location: nil, raw_macaroon: nil)
+      @raw_macaroon = raw_macaroon || RawMacaroon.new(key: key, identifier: identifier, location: location)
     end
 
     def identifier
@@ -22,6 +22,15 @@ module Macaroons
       @raw_macaroon.caveats
     end
 
+    def self.from_binary(serialized)
+      raw_macaroon = RawMacaroon.new(serialized: serialized)
+      macaroon = Macaroons::Macaroon.new(raw_macaroon: raw_macaroon)
+    end
+
+    def serialize()
+      @raw_macaroon.serialize()
+    end
+
     def add_first_party_caveat(predicate)
       @raw_macaroon.add_first_party_caveat(predicate)
     end
@@ -35,7 +44,7 @@ module Macaroons
     end
 
     def third_party_caveats
-       caveats.select{|caveat| caveat.third_party?}
+      caveats.select(&:third_party?)
     end
 
   end
