@@ -27,7 +27,7 @@ module Macaroons
       macaroon = Macaroons::Macaroon.new(raw_macaroon: raw_macaroon)
     end
 
-    def serialize()
+    def serialize
       @raw_macaroon.serialize()
     end
 
@@ -47,5 +47,8 @@ module Macaroons
       caveats.select(&:third_party?)
     end
 
+    def prepare_for_request(macaroon)
+      @raw_macaroon.prepare_for_request(macaroon)
+    end
   end
 end
