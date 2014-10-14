@@ -15,8 +15,9 @@ module Macaroons
       @predicates << predicate
     end
 
-    def satisfy_general(callback)
-      raise ArgumentError, 'Must provide callback' unless callback
+    def satisfy_general(callback = nil, &block)
+      raise ArgumentError, 'Must provide callback or block' unless callback || block_given?
+      callback = block if block_given?
       @callbacks << callback
     end
 
