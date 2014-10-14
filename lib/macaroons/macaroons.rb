@@ -22,6 +22,15 @@ module Macaroons
       @raw_macaroon.caveats
     end
 
+    def from_binary(serialized)
+      @raw_macaroon = RawMacaroon.new(nil, nil, nil, serialized=serialized)
+      self
+    end
+
+    def serialize()
+      @raw_macaroon.serialize()
+    end
+
     def add_first_party_caveat(predicate)
       @raw_macaroon.add_first_party_caveat(predicate)
     end
@@ -35,7 +44,7 @@ module Macaroons
     end
 
     def third_party_caveats
-       caveats.select{|caveat| caveat.third_party?}
+      caveats.select{|caveat| caveat.third_party?}
     end
 
   end
