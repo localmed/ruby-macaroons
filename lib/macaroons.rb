@@ -1,4 +1,5 @@
 require 'macaroons/macaroons'
+require 'macaroons/verifier'
 
 module Macaroon
   class << self
@@ -8,6 +9,12 @@ module Macaroon
 
     def from_binary(serialized)
       Macaroons::Macaroon.from_binary(serialized)
+    end
+  end
+
+  class Verifier
+    def self.new()
+      Macaroons::Verifier.new()
     end
   end
 end
