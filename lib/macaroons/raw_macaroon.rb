@@ -71,6 +71,16 @@ module Macaroons
       Base64.urlsafe_encode64(combined)
     end
 
+    def prepare_for_request(macaroon)
+      bound_macaroon = Marshal.load( Marshal.dump( macaroon ) )
+      key = Utils.truncate_or_pad('0')
+      hash1 = hmac(key, self.signature)
+      hash2 = hmac(key, macaroon.signature)
+      raw = bound_macaroon.instance_variable_get(:@raw_macaroon)
+      raw.instance_variable_set(:@signature, hmac(key, hash1 + hash2))
+      bound_macaroon
+    end
+
     private
 
     def deserialize(serialized)
