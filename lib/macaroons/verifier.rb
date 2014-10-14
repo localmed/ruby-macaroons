@@ -32,26 +32,26 @@ module Macaroons
     def verify_caveats(macaroon, compare_macaroon, discharge_macaroons)
       for caveat in macaroon.caveats
         if caveat.first_party?
-          caveatMet = verify_first_party_caveat(caveat, compare_macaroon)
+          caveat_met = verify_first_party_caveat(caveat, compare_macaroon)
         else
-          caveatMet = verify_third_party_caveat(caveat, compare_macaroon, discharge_macaroons)
+          caveat_met = verify_third_party_caveat(caveat, compare_macaroon, discharge_macaroons)
         end
-        raise CaveatUnsatisfiedError, "Caveat not met. Unable to satisfy: #{caveat.caveat_id}" unless caveatMet
+        raise CaveatUnsatisfiedError, "Caveat not met. Unable to satisfy: #{caveat.caveat_id}" unless caveat_met
       end
     end
 
     def verify_first_party_caveat(caveat, compare_macaroon)
-      caveatMet = false
+      caveat_met = false
       if @predicates.include? caveat.caveat_id
-        caveatMet = true
+        caveat_met = true
       else
         @callbacks.each do |callback|
-          caveatMet = true if callback(caveat.caveat_id)
+          caveat_met = true if callback(caveat.caveat_id)
         end
       end
-      compare_macaroon.add_first_party_caveat(caveat.caveat_id) if caveatMet
+      compare_macaroon.add_first_party_caveat(caveat.caveat_id) if caveat_met
 
-      return caveatMet
+      return caveat_met
     end
 
     def verify_third_party_caveat(caveat, compare_macaroon, discharge_macaroons)
