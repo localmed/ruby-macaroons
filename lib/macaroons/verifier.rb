@@ -15,6 +15,11 @@ module Macaroons
       @predicates << predicate
     end
 
+    def satisfy_general(callback)
+      raise ArgumentError, 'Must provide callback' unless callback
+      @callbacks << callback
+    end
+
     def verify(macaroon: nil, key: nil, discharge_macaroons: nil)
       raise ArgumentError, 'Macaroon and Key required' if macaroon.nil? || key.nil?
 
@@ -46,7 +51,7 @@ module Macaroons
         caveat_met = true
       else
         @callbacks.each do |callback|
-          caveat_met = true if callback(caveat.caveat_id)
+          caveat_met = true if callback.call(caveat.caveat_id)
         end
       end
       compare_macaroon.add_first_party_caveat(caveat.caveat_id) if caveat_met
