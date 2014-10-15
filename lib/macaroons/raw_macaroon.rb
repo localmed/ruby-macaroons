@@ -36,7 +36,7 @@ module Macaroons
     def add_first_party_caveat(predicate)
       caveat = Caveat.new(predicate)
       @caveats << caveat
-      sign_first_party_caveat(predicate)
+      @signature = Utils.sign_first_party_caveat(@signature, predicate)
     end
 
     def add_third_party_caveat(caveat_key, caveat_id, caveat_location)
@@ -47,7 +47,7 @@ module Macaroons
       verification_id = Base64.strict_encode64(ciphertext)
       caveat = Caveat.new(caveat_id, verification_id, caveat_location)
       @caveats << caveat
-      sign_third_party_caveat(verification_id, caveat_id)
+      @signature = Utils.sign_third_party_caveat(@signature, verification_id, caveat_id)
     end
 
     def serialize
@@ -79,8 +79,8 @@ module Macaroons
 
     def bind_signature(signature)
       key = Utils.truncate_or_pad('0')
-      hash1 = Utils.hmac(key, self.signature)
-      hash2 = Utils.hmac(key, signature)
+      hash1 = Utils.hmac(key, Utils.unhexlify(self.signature))
+      hash2 = Utils.hmac(key, Utils.unhexlify(signature))
       Utils.hmac(key, hash1 + hash2)
     end
 
@@ -141,19 +141,8 @@ module Macaroons
     end
 
     def create_initial_macaroon_signature(key, identifier)
-      derived_key = Utils.hmac('macaroons-key-generator', key)
+      derived_key = Utils.generate_derived_key(key)
       Utils.hmac(derived_key, identifier)
-    end
-
-    def sign_first_party_caveat(predicate)
-      @signature = Utils.hmac(@signature, predicate)
-    end
-
-    def sign_third_party_caveat(verification_id, caveat_id)
-      verification_id_hash = Utils.hmac(@signature, verification_id)
-      caveat_id_hash = Utils.hmac(@signature, caveat_id)
-      combined = verification_id_hash + caveat_id_hash
-      @signature = Utils.hmac(@signature, combined)
     end
 
   end
