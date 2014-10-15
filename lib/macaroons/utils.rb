@@ -1,3 +1,5 @@
+require 'openssl'
+
 module Macaroons
   module Utils
 
@@ -22,6 +24,11 @@ module Macaroons
       else
         string
       end
+    end
+
+    def self.hmac(key, data, digest=nil)
+      digest = OpenSSL::Digest.new('sha256') if digest.nil?
+      OpenSSL::HMAC.digest(digest, key, data)
     end
 
   end
