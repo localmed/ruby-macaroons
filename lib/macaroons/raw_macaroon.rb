@@ -1,4 +1,3 @@
-require 'openssl'
 require 'base64'
 
 require 'rbnacl'
@@ -29,6 +28,7 @@ module Macaroons
     attr_reader :key
     attr_reader :location
     attr_reader :caveats
+    attr_accessor :signature
 
     def signature
       Utils.hexlify(@signature).downcase
@@ -37,18 +37,18 @@ module Macaroons
     def add_first_party_caveat(predicate)
       caveat = Caveat.new(predicate)
       @caveats << caveat
-      sign_first_party_caveat(predicate)
+      @signature = Utils.sign_first_party_caveat(@signature, predicate)
     end
 
     def add_third_party_caveat(caveat_key, caveat_id, caveat_location)
-      derived_caveat_key = Utils.truncate_or_pad(hmac('macaroons-key-generator', caveat_key))
+      derived_caveat_key = Utils.truncate_or_pad(Utils.hmac('macaroons-key-generator', caveat_key))
       truncated_or_padded_signature = Utils.truncate_or_pad(@signature)
       box = RbNaCl::SimpleBox.from_secret_key(truncated_or_padded_signature)
       ciphertext = box.encrypt(derived_caveat_key)
       verification_id = Base64.strict_encode64(ciphertext)
       caveat = Caveat.new(caveat_id, verification_id, caveat_location)
       @caveats << caveat
-      sign_third_party_caveat(verification_id, caveat_id)
+      @signature = Utils.sign_third_party_caveat(@signature, verification_id, caveat_id)
     end
 
     def serialize
@@ -73,12 +73,16 @@ module Macaroons
 
     def prepare_for_request(macaroon)
       bound_macaroon = Marshal.load( Marshal.dump( macaroon ) )
-      key = Utils.truncate_or_pad('0')
-      hash1 = hmac(key, self.signature)
-      hash2 = hmac(key, macaroon.signature)
       raw = bound_macaroon.instance_variable_get(:@raw_macaroon)
-      raw.instance_variable_set(:@signature, hmac(key, hash1 + hash2))
+      raw.signature = bind_signature(macaroon.signature)
       bound_macaroon
+    end
+
+    def bind_signature(signature)
+      key = Utils.truncate_or_pad('0')
+      hash1 = Utils.hmac(key, Utils.unhexlify(self.signature))
+      hash2 = Utils.hmac(key, Utils.unhexlify(signature))
+      Utils.hmac(key, hash1 + hash2)
     end
 
     private
@@ -92,9 +96,9 @@ module Macaroons
 
       while index < decoded.length
         packet_length = decoded[index..(index + PACKET_PREFIX_LENGTH - 1)].to_i(16)
-        packet = decoded[index + PACKET_PREFIX_LENGTH..(index + packet_length - 2)]
+        stripped_packet = decoded[index + PACKET_PREFIX_LENGTH..(index + packet_length - 2)]
 
-        key, value = depacketize(packet)
+        key, value = depacketize(stripped_packet)
 
         case key
         when 'location'
@@ -138,24 +142,8 @@ module Macaroons
     end
 
     def create_initial_macaroon_signature(key, identifier)
-      derived_key = hmac('macaroons-key-generator', key)
-      hmac(derived_key, identifier)
-    end
-
-    def hmac(key, data, digest=nil)
-      digest = OpenSSL::Digest.new('sha256') if digest.nil?
-      OpenSSL::HMAC.digest(digest, key, data)
-    end
-
-    def sign_first_party_caveat(predicate)
-      @signature = hmac(@signature, predicate)
-    end
-
-    def sign_third_party_caveat(verification_id, caveat_id)
-      verification_id_hash = hmac(@signature, verification_id)
-      caveat_id_hash = hmac(@signature, caveat_id)
-      combined = verification_id_hash + caveat_id_hash
-      @signature = hmac(@signature, combined)
+      derived_key = Utils.generate_derived_key(key)
+      Utils.hmac(derived_key, identifier)
     end
 
   end

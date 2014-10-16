@@ -1,3 +1,5 @@
+require 'rbnacl'
+
 require 'macaroons/errors'
 
 module Macaroons
@@ -8,6 +10,7 @@ module Macaroons
     def initialize
       @predicates = []
       @callbacks = []
+      @calculated_signature = nil
     end
 
     def satisfy_exact(predicate)
@@ -23,30 +26,39 @@ module Macaroons
 
     def verify(macaroon: nil, key: nil, discharge_macaroons: nil)
       raise ArgumentError, 'Macaroon and Key required' if macaroon.nil? || key.nil?
+      key = Utils.generate_derived_key(key)
+      verify_discharge(root: macaroon, macaroon: macaroon, key: key, discharge_macaroons:discharge_macaroons)
+    end
 
-      compare_macaroon = Macaroons::Macaroon.new(key: key, identifier: macaroon.identifier, location: macaroon.location)
+    def verify_discharge(root: root, macaroon: macaroon, key: key, discharge_macaroons: [])
+      @calculated_signature = Utils.hmac(key, macaroon.identifier)
 
-      verify_caveats(macaroon, compare_macaroon, discharge_macaroons)
+      verify_caveats(macaroon, discharge_macaroons)
 
-      raise SignatureMismatchError, 'Signatures do not match.' unless signatures_match(macaroon.signature, compare_macaroon.signature)
+      if root != macaroon
+        raw = root.instance_variable_get(:@raw_macaroon)
+        @calculated_signature = raw.bind_signature(Utils.hexlify(@calculated_signature))
+      end
+
+      raise SignatureMismatchError, 'Signatures do not match.' unless signatures_match(Utils.unhexlify(macaroon.signature), @calculated_signature)
 
       return true
     end
 
     private
 
-    def verify_caveats(macaroon, compare_macaroon, discharge_macaroons)
+    def verify_caveats(macaroon, discharge_macaroons)
       for caveat in macaroon.caveats
         if caveat.first_party?
-          caveat_met = verify_first_party_caveat(caveat, compare_macaroon)
+          caveat_met = verify_first_party_caveat(caveat)
         else
-          caveat_met = verify_third_party_caveat(caveat, compare_macaroon, discharge_macaroons)
+          caveat_met = verify_third_party_caveat(caveat, macaroon, discharge_macaroons)
         end
         raise CaveatUnsatisfiedError, "Caveat not met. Unable to satisfy: #{caveat.caveat_id}" unless caveat_met
       end
     end
 
-    def verify_first_party_caveat(caveat, compare_macaroon)
+    def verify_first_party_caveat(caveat)
       caveat_met = false
       if @predicates.include? caveat.caveat_id
         caveat_met = true
@@ -55,14 +67,38 @@ module Macaroons
           caveat_met = true if callback.call(caveat.caveat_id)
         end
       end
-      compare_macaroon.add_first_party_caveat(caveat.caveat_id) if caveat_met
-
+      @calculated_signature = Utils.sign_first_party_caveat(@calculated_signature, caveat.caveat_id) if caveat_met
       return caveat_met
     end
 
-    def verify_third_party_caveat(caveat, compare_macaroon, discharge_macaroons)
-      # TODO
-      raise NotImplementedError
+    def verify_third_party_caveat(caveat, root_macaroon, discharge_macaroons)
+      caveat_met = false
+
+      caveat_macaroon = discharge_macaroons.find { |m| m.identifier == caveat.caveat_id }
+      raise CaveatUnsatisfiedError, "Caveat not met. No discharge macaroon found for identifier: #{caveat.caveat_id}" unless caveat_macaroon
+
+      caveat_key = extract_caveat_key(@calculated_signature, caveat)
+      caveat_macaroon_verifier = Verifier.new()
+      caveat_macaroon_verifier.predicates = @predicates
+      caveat_macaroon_verifier.callbacks = @callbacks
+
+      caveat_met = caveat_macaroon_verifier.verify_discharge(
+          root: root_macaroon,
+          macaroon: caveat_macaroon,
+          key: caveat_key,
+          discharge_macaroons: discharge_macaroons
+      )
+      if caveat_met
+        @calculated_signature = Utils.sign_third_party_caveat(@calculated_signature, caveat.verification_id, caveat.caveat_id)
+      end
+      return caveat_met
+    end
+
+    def extract_caveat_key(signature, caveat)
+      key = Utils.truncate_or_pad(signature)
+      box = RbNaCl::SimpleBox.from_secret_key(key)
+      decoded_vid = Base64.strict_decode64(caveat.verification_id)
+      box.decrypt(decoded_vid)
     end
 
     def signatures_match(a, b)
