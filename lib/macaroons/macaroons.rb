@@ -23,7 +23,7 @@ module Macaroons
     end
 
     def self.from_binary(serialized)
-      raw_macaroon = RawMacaroon.new(serialized: serialized)
+      raw_macaroon = RawMacaroon.from_binary(serialized: serialized)
       macaroon = Macaroons::Macaroon.new(raw_macaroon: raw_macaroon)
     end
 
