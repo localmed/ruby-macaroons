@@ -28,6 +28,7 @@ module Macaroons
     attr_reader :key
     attr_reader :location
     attr_reader :caveats
+    attr_accessor :signature
 
     def signature
       Utils.hexlify(@signature).downcase
@@ -73,7 +74,7 @@ module Macaroons
     def prepare_for_request(macaroon)
       bound_macaroon = Marshal.load( Marshal.dump( macaroon ) )
       raw = bound_macaroon.instance_variable_get(:@raw_macaroon)
-      raw.instance_variable_set(:@signature, bind_signature(macaroon.signature))
+      raw.signature = bind_signature(macaroon.signature)
       bound_macaroon
     end
 
