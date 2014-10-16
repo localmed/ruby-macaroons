@@ -27,8 +27,17 @@ module Macaroons
       macaroon = Macaroons::Macaroon.new(raw_macaroon: raw_macaroon)
     end
 
+    def self.from_json(serialized)
+      raw_macaroon = RawMacaroon.from_json(serialized: serialized)
+      macaroon = Macaroons::Macaroon.new(raw_macaroon: raw_macaroon)
+    end
+
     def serialize
       @raw_macaroon.serialize()
+    end
+
+    def serialize_json
+      @raw_macaroon.serialize_json()
     end
 
     def add_first_party_caveat(predicate)

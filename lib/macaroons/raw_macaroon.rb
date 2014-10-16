@@ -5,6 +5,7 @@ require 'rbnacl'
 require 'macaroons/caveat'
 require 'macaroons/utils'
 require 'macaroons/serializers/binary'
+require 'macaroons/serializers/json'
 
 module Macaroons
   class RawMacaroon
@@ -23,6 +24,10 @@ module Macaroons
 
     def self.from_binary(serialized: serialized)
       Macaroons::BinarySerializer.new().deserialize(serialized)
+    end
+
+    def self.from_json(serialized: serialized)
+      Macaroons::JsonSerializer.new().deserialize(serialized)
     end
 
     attr_reader :identifier
@@ -54,6 +59,10 @@ module Macaroons
 
     def serialize
       Macaroons::BinarySerializer.new().serialize(self)
+    end
+
+    def serialize_json
+      Macaroons::JsonSerializer.new().serialize(self)
     end
 
     def prepare_for_request(macaroon)

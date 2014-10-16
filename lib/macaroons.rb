@@ -10,6 +10,10 @@ module Macaroon
     def from_binary(serialized)
       Macaroons::Macaroon.from_binary(serialized)
     end
+
+    def from_json(serialized)
+      Macaroons::Macaroon.from_json(serialized)
+    end
   end
 
   class Verifier
