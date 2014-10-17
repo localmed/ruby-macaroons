@@ -3,7 +3,7 @@ require 'macaroons/verifier'
 
 module Macaroon
   class << self
-    def new(location, identifier, key)
+    def new(location: location, identifier: identifier, key: key)
       Macaroons::Macaroon.new(location:location, identifier:identifier, key:key)
     end
 
