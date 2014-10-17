@@ -6,9 +6,9 @@ describe 'Macaroon' do
   context 'without caveats' do
     it 'should have correct signature' do
       m = Macaroon.new(
-        'http://mybank/',
-        'we used our secret key',
-        'this is our super secret key; only we should know it'
+        location: 'http://mybank/',
+        identifier: 'we used our secret key',
+        key: 'this is our super secret key; only we should know it'
       )
       expect(m.signature).to eql('e3d9e02908526c4c0039ae15114115d97fdd68bf2ba379b342aaf0f617d0552f')
     end
@@ -17,9 +17,9 @@ describe 'Macaroon' do
   context 'with first party caveat' do
     it 'should have correct signature' do
       m = Macaroon.new(
-        'http://mybank/',
-        'we used our secret key',
-        'this is our super secret key; only we should know it'
+        location: 'http://mybank/',
+        identifier: 'we used our secret key',
+        key: 'this is our super secret key; only we should know it'
       )
       m.add_first_party_caveat('test = caveat')
       expect(m.signature).to eql('197bac7a044af33332865b9266e26d493bdd668a660e44d88ce1a998c23dbd67')
@@ -29,9 +29,9 @@ describe 'Macaroon' do
   context 'when serilizing as binary' do
     it 'should serialize properly' do
       m = Macaroon.new(
-        'http://mybank/',
-        'we used our secret key',
-        'this is our super secret key; only we should know it'
+        location: 'http://mybank/',
+        identifier: 'we used our secret key',
+        key: 'this is our super secret key; only we should know it'
       )
       m.add_first_party_caveat('test = caveat')
       expect(m.serialize()).to eql('MDAxY2xvY2F0aW9uIGh0dHA6Ly9teWJhbmsvCjAwMjZpZGVudGlmaWVyIHdlIHVzZWQgb3VyIHNlY3JldCBrZXkKMDAxNmNpZCB0ZXN0ID0gY2F2ZWF0CjAwMmZzaWduYXR1cmUgGXusegRK8zMyhluSZuJtSTvdZopmDkTYjOGpmMI9vWcK')
@@ -50,9 +50,9 @@ describe 'Macaroon' do
   context 'when serilizing as json' do
     it 'should serialize properly' do
       m = Macaroon.new(
-        'http://mybank/',
-        'we used our secret key',
-        'this is our super secret key; only we should know it'
+        location: 'http://mybank/',
+        identifier: 'we used our secret key',
+        key: 'this is our super secret key; only we should know it'
       )
       m.add_first_party_caveat('test = caveat')
       expect(m.serialize_json()).to eql('{"location":"http://mybank/","identifier":"we used our secret key","caveats":[{"cid":"test = caveat","vid":null,"cl":null}],"signature":"197bac7a044af33332865b9266e26d493bdd668a660e44d88ce1a998c23dbd67"}')
@@ -71,9 +71,9 @@ describe 'Macaroon' do
   context 'when serializing/deserializing binary with first and third caveats' do
     it 'should serialize/deserialize properly' do
       m = Macaroon.new(
-          'http://mybank/',
-          'we used our other secret key',
-          'this is a different super-secret key; never use the same secret twice'
+          location: 'http://mybank/',
+          identifier: 'we used our other secret key',
+          key: 'this is a different super-secret key; never use the same secret twice'
       )
       m.add_first_party_caveat('account = 3735928559')
       caveat_key = '4; guaranteed random by a fair toss of the dice'
@@ -87,9 +87,9 @@ describe 'Macaroon' do
   context 'when serializing/deserializing json with first and third caveats' do
     it 'should serialize/deserialize properly' do
       m = Macaroon.new(
-          'http://mybank/',
-          'we used our other secret key',
-          'this is a different super-secret key; never use the same secret twice'
+          location: 'http://mybank/',
+          identifier: 'we used our other secret key',
+          key: 'this is a different super-secret key; never use the same secret twice'
       )
       m.add_first_party_caveat('account = 3735928559')
       caveat_key = '4; guaranteed random by a fair toss of the dice'
@@ -100,12 +100,12 @@ describe 'Macaroon' do
     end
   end
 
-  context 'when perparing a macaroon for request' do
+  context 'when preparing a macaroon for request' do
     it 'should bind the signature to the root' do
       m = Macaroon.new(
-        'http://mybank/',
-        'we used our other secret key',
-        'this is a different super-secret key; never use the same secret twice'
+        location: 'http://mybank/',
+        identifier: 'we used our other secret key',
+        key: 'this is a different super-secret key; never use the same secret twice'
       )
       m.add_first_party_caveat('account = 3735928559')
       caveat_key = '4; guaranteed random by a fair toss of the dice'
@@ -113,9 +113,9 @@ describe 'Macaroon' do
       m.add_third_party_caveat(caveat_key, identifier, 'http://auth.mybank/')
 
       discharge = Macaroon.new(
-        'http://auth.mybank/',
-        identifier,
-        caveat_key
+        location: 'http://auth.mybank/',
+        identifier: identifier,
+        key: caveat_key
       )
       discharge.add_first_party_caveat('time < 2015-01-01T00:00')
       protected_discharge = m.prepare_for_request(discharge)
@@ -129,9 +129,9 @@ describe 'Verifier' do
   context 'verifying first party exact caveats' do
     before(:all) do
       @m = Macaroon.new(
-        'http://mybank/',
-        'we used our secret key',
-        'this is our super secret key; only we should know it'
+        location: 'http://mybank/',
+        identifier: 'we used our secret key',
+        key: 'this is our super secret key; only we should know it'
       )
       @m.add_first_party_caveat('test = caveat')
     end
@@ -163,9 +163,9 @@ describe 'Verifier' do
   context 'verifying first party general caveats' do
     before(:all) do
       @m = Macaroon.new(
-        'http://mybank/',
-        'we used our secret key',
-        'this is our super secret key; only we should know it'
+        location: 'http://mybank/',
+        identifier: 'we used our secret key',
+        key: 'this is our super secret key; only we should know it'
       )
       @m.add_first_party_caveat('general caveat')
     end
@@ -198,9 +198,9 @@ describe 'Verifier' do
   context 'verifying third party caveats' do
     before(:all) do
       @m = Macaroon.new(
-        'http://mybank/',
-        'we used our other secret key',
-        'this is a different super-secret key; never use the same secret twice'
+        location: 'http://mybank/',
+        identifier: 'we used our other secret key',
+        key: 'this is a different super-secret key; never use the same secret twice'
       )
       @m.add_first_party_caveat('account = 3735928559')
       caveat_key = '4; guaranteed random by a fair toss of the dice'
@@ -208,9 +208,9 @@ describe 'Verifier' do
       @m.add_third_party_caveat(caveat_key, identifier, 'http://auth.mybank/')
 
       discharge = Macaroon.new(
-        'http://auth.mybank/',
-        identifier,
-        caveat_key
+        location: 'http://auth.mybank/',
+        identifier: identifier,
+        key: caveat_key
       )
       discharge.add_first_party_caveat('time < 2015-01-01T00:00')
       @protected_discharge = @m.prepare_for_request(discharge)
