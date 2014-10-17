@@ -7,7 +7,7 @@ Gem::Specification.new do |spec|
   spec.name = 'macaroons'
   spec.version = Macaroons::VERSION
   spec.authors       = ["Evan Cordell", "Peter Browne", "Joel James"]
-  spec.email         = ["ecordell@localmed.com", "Peter Browne <pete@localmed.com>", "joel.james@localmed.com"]
+  spec.email         = ["ecordell@localmed.com", "pete@localmed.com", "joel.james@localmed.com"]
   spec.summary       = "Macaroons library in Ruby"
   spec.description   = "Macaroons library in Ruby"
 
