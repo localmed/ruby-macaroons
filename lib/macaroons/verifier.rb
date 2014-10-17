@@ -37,7 +37,7 @@ module Macaroons
 
       if root != macaroon
         raw = root.instance_variable_get(:@raw_macaroon)
-        @calculated_signature = raw.bind_signature(Utils.hexlify(@calculated_signature))
+        @calculated_signature = raw.bind_signature(Utils.hexlify(@calculated_signature).downcase)
       end
 
       raise SignatureMismatchError, 'Signatures do not match.' unless signatures_match(Utils.unhexlify(macaroon.signature), @calculated_signature)
