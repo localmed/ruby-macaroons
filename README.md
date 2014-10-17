@@ -1,4 +1,5 @@
 # Macaroons
+[![Build Status](https://travis-ci.org/localmed/ruby-macaroons.svg?branch=master)](https://travis-ci.org/localmed/ruby-macaroons)
 
 This is a Ruby implementation of Macaroons. It is still under active development but is in a useable state - please report any bugs in the issue tracker.
 
