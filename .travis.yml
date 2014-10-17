@@ -1,0 +1,19 @@
+language: ruby
+rvm:
+  - 2.1.0
+  - jruby-18mode
+  - jruby-19mode
+  - rbx-2
+  - ruby-head
+  - jruby-head
+  - ree
+before_install:
+  - wget https://github.com/jedisct1/libsodium/releases/download/0.7.0/libsodium-0.7.0.tar.gz
+  - tar xzvf libsodium-0.7.0.tar.gz
+  - cd libsodium-0.7.0
+  - ./configure && make && make check && sudo make install
+  - sudo ldconfig
+  - cd ..
+install: "bundle install"
+script: rspec .
+after_success: coveralls
