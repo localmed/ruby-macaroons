@@ -1,6 +1,7 @@
 # Macaroons
 [![Build Status](https://travis-ci.org/localmed/ruby-macaroons.svg?branch=master)](https://travis-ci.org/localmed/ruby-macaroons)
 [![Coverage Status](https://img.shields.io/coveralls/localmed/ruby-macaroons.svg)](https://coveralls.io/r/localmed/ruby-macaroons?branch=master)
+
 This is a Ruby implementation of Macaroons. It is still under active development but is in a useable state - please report any bugs in the issue tracker.
 
 ## What is a Macaroon? 
@@ -12,24 +13,19 @@ Simple examples are outlined below. For more in-depth examples check out the [fu
 
 ## Installing
 
-To use macaroons, you will need to install libsodium:
-[libsodium](https://github.com/jedisct1/libsodium)
+Macaroons requires a sodium library like libsodium or tweetnacl to be installed on the host system.
+
+To install [libsodium](https://github.com/jedisct1/libsodium):
 
 For OS X users, libsodium is available via homebrew and can be installed with:
 
     brew install libsodium
 
-For FreeBSD users, libsodium is available both via pkgng and ports. To install a binary package:
-
-    pkg install libsodium
-
-To install from ports on FreeBSD, use your favorite ports front end (e.g. portmaster or portupgrade), or use make as follows:
-
-    cd /usr/ports/security/libsodium; make install clean
+For other systems, please see the [libsodium documentation](http://doc.libsodium.org/).
 
 ### Macaroons gem
 
-Once you have libsodium installed, Add this line to your application's Gemfile:
+Once you have libsodium installed, add this line to your application's Gemfile:
 
     gem 'macaroons'
 
@@ -37,17 +33,18 @@ And then execute:
 
     $ bundle
 
-Or install it yourself as:
+Or install it manually:
 
     $ gem install macaroons
 
-Inside of your Ruby program do:
+Inside of your Ruby program:
+
     require 'macaroons'
 
 ## Quickstart
 
     key => Very secret key used to sign the macaroon
-    identifier => An identifier for the macaroon
+    identifier => An identifier, to remind you which key was used to sign the macaroon
     location => The location at which the macaroon is created
 
     # Construct a Macaroon.
