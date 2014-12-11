@@ -18,7 +18,7 @@ module Macaroons
       macaroon = Macaroons::RawMacaroon.new(key: 'no_key', identifier: deserialized['identifier'], location: deserialized['location'])
       deserialized['caveats'].each do |c|
         caveat = Macaroons::Caveat.new(c['cid'], c['vid'], c['cl'])
-        macaroon.caveats << c
+        macaroon.caveats << caveat
       end
       macaroon.signature = Utils.unhexlify(deserialized['signature'])
       macaroon
