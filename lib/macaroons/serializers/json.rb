@@ -1,4 +1,4 @@
-require 'json'
+require 'multi_json'
 
 module Macaroons
   class JsonSerializer
@@ -10,11 +10,11 @@ module Macaroons
           caveats: macaroon.caveats.map!(&:to_h),
           signature: macaroon.signature
         }
-        return serialized.to_json
+        MultiJson.dump(serialized)
     end
 
     def deserialize(serialized)
-      deserialized = JSON.parse(serialized)
+      deserialized = MultiJson.load(serialized)
       macaroon = Macaroons::RawMacaroon.new(key: 'no_key', identifier: deserialized['identifier'], location: deserialized['location'])
       deserialized['caveats'].each do |c|
         caveat = Macaroons::Caveat.new(c['cid'], c['vid'], c['cl'])
