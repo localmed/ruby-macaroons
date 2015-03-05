@@ -38,12 +38,33 @@ describe 'Macaroon' do
     end
   end
 
+  context 'when serilizing as binary with padding' do
+    it 'should strip the padding' do
+      m = Macaroon.new(
+        location: 'http://mybank/',
+        identifier: 'we used our secret key',
+        key: 'this is our super secret key; only we should know it'
+      )
+      m.add_first_party_caveat('test = a caveat')
+      expect(m.serialize()).to eql('MDAxY2xvY2F0aW9uIGh0dHA6Ly9teWJhbmsvCjAwMjZpZGVudGlmaWVyIHdlIHVzZWQgb3VyIHNlY3JldCBrZXkKMDAxOGNpZCB0ZXN0ID0gYSBjYXZlYXQKMDAyZnNpZ25hdHVyZSAOX3fqTY3ESWO6a5DZltZZReCDkfjbcdwSQDTdBrhApwo')
+    end
+  end
+
   context 'when deserializing binary' do
     it 'should deserialize properly' do
       m = Macaroon.from_binary(
         'MDAxY2xvY2F0aW9uIGh0dHA6Ly9teWJhbmsvCjAwMjZpZGVudGlmaWVyIHdlIHVzZWQgb3VyIHNlY3JldCBrZXkKMDAxNmNpZCB0ZXN0ID0gY2F2ZWF0CjAwMmZzaWduYXR1cmUgGXusegRK8zMyhluSZuJtSTvdZopmDkTYjOGpmMI9vWcK'
       )
       expect(m.signature).to eql('197bac7a044af33332865b9266e26d493bdd668a660e44d88ce1a998c23dbd67')
+    end
+  end
+
+  context 'when deserializing binary without padding' do
+    it 'should add padding' do
+      m = Macaroon.from_binary(
+        'MDAxY2xvY2F0aW9uIGh0dHA6Ly9teWJhbmsvCjAwMjZpZGVudGlmaWVyIHdlIHVzZWQgb3VyIHNlY3JldCBrZXkKMDAxOGNpZCB0ZXN0ID0gYSBjYXZlYXQKMDAyZnNpZ25hdHVyZSAOX3fqTY3ESWO6a5DZltZZReCDkfjbcdwSQDTdBrhApwo='
+      )
+      expect(m.signature).to eql('0e5f77ea4d8dc44963ba6b90d996d65945e08391f8db71dc124034dd06b840a7')
     end
   end
 
