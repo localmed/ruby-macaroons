@@ -23,12 +23,12 @@ module Macaroons
         'signature',
         Utils.unhexlify(macaroon.signature)
       )
-      Base64.urlsafe_encode64(combined)
+      base64_url_encode(combined)
     end
 
     def deserialize(serialized)
       caveats = []
-      decoded = Base64.urlsafe_decode64(serialized)
+      decoded = base64_url_decode(serialized)
 
       index = 0
 
@@ -85,5 +85,13 @@ module Macaroons
       [key, value]
     end
 
+    def base64_url_decode(str)
+      str += '=' * (4 - str.length.modulo(4)).modulo(4)
+      Base64.urlsafe_decode64(str)
+    end
+
+    def base64_url_encode(str)
+      Base64.urlsafe_encode64(str).tr('=', '')
+    end
   end
 end
