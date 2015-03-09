@@ -86,7 +86,10 @@ module Macaroons
     end
 
     def base64_url_decode(str)
+      str = str.delete('=')
+      p str
       str += '=' * (4 - str.length.modulo(4)).modulo(4)
+      p str
       Base64.urlsafe_decode64(str)
     end
 
