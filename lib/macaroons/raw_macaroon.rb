@@ -51,7 +51,7 @@ module Macaroons
       truncated_or_padded_signature = Utils.truncate_or_pad(@signature)
       box = RbNaCl::SimpleBox.from_secret_key(truncated_or_padded_signature)
       ciphertext = box.encrypt(derived_caveat_key)
-      verification_id = Base64.strict_encode64(ciphertext)
+      verification_id = ciphertext
       caveat = Caveat.new(caveat_id, verification_id, caveat_location)
       @caveats << caveat
       @signature = Utils.sign_third_party_caveat(@signature, verification_id, caveat_id)

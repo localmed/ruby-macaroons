@@ -97,7 +97,7 @@ module Macaroons
     def extract_caveat_key(signature, caveat)
       key = Utils.truncate_or_pad(signature)
       box = RbNaCl::SimpleBox.from_secret_key(key)
-      decoded_vid = Base64.strict_decode64(caveat.verification_id)
+      decoded_vid = caveat.verification_id
       box.decrypt(decoded_vid)
     end
 
