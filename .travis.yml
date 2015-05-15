@@ -2,7 +2,6 @@ language: ruby
 rvm:
   - 2.1.0
   - 2.0.0
-  - ruby-head
 before_install:
   - wget https://github.com/jedisct1/libsodium/releases/download/0.7.0/libsodium-0.7.0.tar.gz
   - tar xzvf libsodium-0.7.0.tar.gz
