@@ -86,7 +86,7 @@ m.add_third_party_caveat(caveat_key, identifier, 'http://auth.mybank/')
 discharge = Macaroon.new(
   location: 'http://auth.mybank/',
   identifier: identifier,
-  caveat: Ocaveat_key
+  key: caveat_key
 )
 discharge.add_first_party_caveat('time < 2015-01-01T00:00')
 
