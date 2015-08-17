@@ -73,7 +73,7 @@ module Macaroons
     end
 
     def bind_signature(signature)
-      key = Utils.truncate_or_pad('0')
+      key = Utils.truncate_or_pad("\0")
       hash1 = Utils.hmac(key, Utils.unhexlify(self.signature))
       hash2 = Utils.hmac(key, Utils.unhexlify(signature))
       Utils.hmac(key, hash1 + hash2)

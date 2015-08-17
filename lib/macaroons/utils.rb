@@ -19,8 +19,8 @@ module Macaroons
       size = size.nil? ? 32 : size
       if string.length > size
         string[0, size]
-      elsif string.length > size
-        string + '\0'*(size-string.length)
+      elsif string.length < size
+        string + "\0"*(size-string.length)
       else
         string
       end
