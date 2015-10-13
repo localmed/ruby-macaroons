@@ -64,7 +64,7 @@ module Macaroons
         caveat_met = true
       else
         @callbacks.each do |callback|
-          caveat_met = true if callback.call(caveat.caveat_id)
+          caveat_met = true if callback.call(caveat.caveat_id) == true
         end
       end
       @calculated_signature = Utils.sign_first_party_caveat(@calculated_signature, caveat.caveat_id) if caveat_met
