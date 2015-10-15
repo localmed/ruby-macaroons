@@ -22,11 +22,11 @@ module Macaroons
       @caveats = []
     end
 
-    def self.from_binary(serialized: serialized)
+    def self.from_binary(serialized: nil)
       Macaroons::BinarySerializer.new().deserialize(serialized)
     end
 
-    def self.from_json(serialized: serialized)
+    def self.from_json(serialized: nil)
       Macaroons::JsonSerializer.new().deserialize(serialized)
     end
 

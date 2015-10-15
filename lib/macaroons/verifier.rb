@@ -30,7 +30,7 @@ module Macaroons
       verify_discharge(root: macaroon, macaroon: macaroon, key: key, discharge_macaroons:discharge_macaroons)
     end
 
-    def verify_discharge(root: root, macaroon: macaroon, key: key, discharge_macaroons: [])
+    def verify_discharge(root: nil, macaroon: nil, key: nil, discharge_macaroons: [])
       @calculated_signature = Utils.hmac(key, macaroon.identifier)
 
       verify_caveats(macaroon, discharge_macaroons)
