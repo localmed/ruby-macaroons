@@ -3,7 +3,7 @@
 [![Coverage Status](https://img.shields.io/coveralls/localmed/ruby-macaroons.svg)](https://coveralls.io/r/localmed/ruby-macaroons?branch=master)
 [![Gem Version](https://badge.fury.io/rb/macaroons.svg)](http://badge.fury.io/rb/macaroons)
 
-This is a Ruby implementation of Macaroons. It is still under active development but is in a useable state - please report any bugs in the issue tracker.
+This is a Ruby implementation of macaroons. The implementation is stable but should be considered temporary, pending any standardization attempts around macaroons.
 
 ## What is a Macaroon? 
 Macaroons, like cookies, are a form of bearer credential. Unlike opaque tokens, macaroons embed *caveats* that define specific authorization requirements for the *target service*, the service that issued the root macaroon and which is capable of verifying the integrity of macaroons it recieves. 
@@ -14,54 +14,42 @@ Simple examples are outlined below. For more in-depth examples check out the [fu
 
 ## Installing
 
-Macaroons requires a sodium library like libsodium or tweetnacl to be installed on the host system.
+The macaroon implementation is pure Ruby, but relies on [rbnacl-libsodium](https://github.com/cryptosphere/rbnacl-libsodium) to provide strong cryptographic primitives.
 
-To install [libsodium](https://github.com/jedisct1/libsodium):
+Install with: 
 
-For OS X users, libsodium is available via homebrew and can be installed with:
+```
+gem install macaroons
+```
 
-    brew install libsodium
+And then import it into your Ruby program:
 
-For other systems, please see the [libsodium documentation](http://doc.libsodium.org/).
-
-### Macaroons gem
-
-Once you have libsodium installed, add this line to your application's Gemfile:
-
-    gem 'macaroons'
-
-And then execute:
-
-    $ bundle
-
-Or install it manually:
-
-    $ gem install macaroons
-
-Inside of your Ruby program:
-
-    require 'macaroons'
+```ruby
+require 'macaroons'
+```
 
 ## Quickstart
 
-    key => Very secret key used to sign the macaroon
-    identifier => An identifier, to remind you which key was used to sign the macaroon
-    location => The location at which the macaroon is created
+```ruby
+key => Very secret key used to sign the macaroon
+identifier => An identifier, to remind you which key was used to sign the macaroon
+location => The location at which the macaroon is created
 
-    # Construct a Macaroon.
-    m = Macaroon.new(key: key, identifier: identifier, location: 'http://foo.com')
+# Construct a Macaroon.
+m = Macaroon.new(key: key, identifier: identifier, location: 'http://foo.com')
 
-    # Add first party caveat
-    m.add_first_party_caveat('caveat_1')
+# Add first party caveat
+m.add_first_party_caveat('caveat_1')
 
-    # List all first party caveats
-    m.first_party_caveats
+# List all first party caveats
+m.first_party_caveats
 
-    # Add third party caveat
-    m.add_third_party_caveat('caveat_key', 'caveat_id', 'http://foo.com')
+# Add third party caveat
+m.add_third_party_caveat('caveat_key', 'caveat_id', 'http://foo.com')
 
-    # List all third party caveats
-    m.third_party_caveats
+# List all third party caveats
+m.third_party_caveats
+```
 
 ## Example with first- and third-party caveats
 
@@ -118,4 +106,4 @@ PyMacaroons, libmacaroons, and Ruby-Macaroons all use the same underlying crypto
 - [Mozilla Macaroon Tech Talk](https://air.mozilla.org/macaroons-cookies-with-contextual-caveats-for-decentralized-authorization-in-the-cloud/)
 - [libmacaroons](https://github.com/rescrv/libmacaroons)
 - [PyMacaroons](https://github.com/ecordell/pymacaroons)
-- [libnacl](https://github.com/saltstack/libnacl)
+- [rbnacl-libsodium](https://github.com/cryptosphere/rbnacl-libsodium) 
