@@ -3,7 +3,7 @@
 [![Coverage Status](https://img.shields.io/coveralls/localmed/ruby-macaroons.svg)](https://coveralls.io/r/localmed/ruby-macaroons?branch=master)
 [![Gem Version](https://badge.fury.io/rb/macaroons.svg)](http://badge.fury.io/rb/macaroons)
 
-This is a Ruby implementation of macaroons. The implementation is stable but should be considered temporary, pending any standardization attempts around macaroons.
+This is a Ruby implementation of macaroons. The implementation is stable but could still be subject to change, pending any standardization attempts around macaroons.
 
 ## What is a Macaroon? 
 Macaroons, like cookies, are a form of bearer credential. Unlike opaque tokens, macaroons embed *caveats* that define specific authorization requirements for the *target service*, the service that issued the root macaroon and which is capable of verifying the integrity of macaroons it recieves. 
