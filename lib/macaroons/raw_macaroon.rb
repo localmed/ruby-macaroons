@@ -1,6 +1,6 @@
 require 'base64'
 
-require 'rbnacl'
+require 'rbnacl/libsodium'
 
 require 'macaroons/caveat'
 require 'macaroons/utils'
