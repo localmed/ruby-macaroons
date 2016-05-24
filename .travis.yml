@@ -4,13 +4,6 @@ rvm:
   - 2.2.5
   - 2.1.10
   - 2.0.0
-before_install:
-  - wget https://github.com/jedisct1/libsodium/releases/download/0.7.0/libsodium-0.7.0.tar.gz
-  - tar xzvf libsodium-0.7.0.tar.gz
-  - cd libsodium-0.7.0
-  - ./configure && make && make check && sudo make install
-  - sudo ldconfig
-  - cd ..
 cache: bundler
 script: rspec .
 after_success: coveralls
