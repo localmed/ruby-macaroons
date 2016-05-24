@@ -9,6 +9,7 @@ before_install:
   - ./configure && make && make check && sudo make install
   - sudo ldconfig
   - cd ..
+cache: bundler
 install: "bundle install"
 script: rspec .
 after_success: coveralls
