@@ -16,7 +16,7 @@ Gem::Specification.new do |spec|
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
   spec.require_paths = ["lib"]
   spec.required_ruby_version = "~> 2.0"
-  spec.add_dependency "multi_json", "~> 1.10.1"
+  spec.add_dependency "multi_json", "~> 1.10"
   spec.add_dependency "rbnacl", "~> 3.2"
   spec.add_dependency "rbnacl-libsodium", "~> 1.0"
 
