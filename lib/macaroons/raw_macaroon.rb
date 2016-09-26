@@ -12,7 +12,7 @@ module Macaroons
 
     def initialize(key: nil, identifier: nil, location: nil)
       if key.nil? || identifier.nil? || location.nil?
-        raise ArgumentError, 'Must provide all three: (key, id, location)'
+        raise ArgumentError, 'Must provide all three: (key, identifier, location)'
       end
 
       @key = key
