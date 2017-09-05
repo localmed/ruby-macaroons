@@ -1,10 +1,9 @@
 sudo: false
 language: ruby
 rvm:
-  - 2.3.1
-  - 2.2.5
-  - 2.1.10
-  - 2.0.0
+  - 2.4.1
+  - 2.3.3
+  - 2.2.7
 cache: bundler
 script: bundle exec rspec
 after_success: coveralls
