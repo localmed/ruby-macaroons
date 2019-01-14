@@ -14,7 +14,7 @@ Simple examples are outlined below. For more in-depth examples check out the [fu
 
 ## Installing
 
-The macaroon implementation is pure Ruby, but relies on [rbnacl-libsodium](https://github.com/cryptosphere/rbnacl-libsodium) to provide strong cryptographic primitives.
+The macaroon implementation is pure Ruby, but relies on [rbnacl](https://github.com/crypto-rb/rbnacl) to provide strong cryptographic primitives.
 
 Install with: 
 
@@ -106,4 +106,4 @@ PyMacaroons, libmacaroons, and Ruby-Macaroons all use the same underlying crypto
 - [Mozilla Macaroon Tech Talk](https://air.mozilla.org/macaroons-cookies-with-contextual-caveats-for-decentralized-authorization-in-the-cloud/)
 - [libmacaroons](https://github.com/rescrv/libmacaroons)
 - [PyMacaroons](https://github.com/ecordell/pymacaroons)
-- [rbnacl-libsodium](https://github.com/cryptosphere/rbnacl-libsodium) 
+- [rbnacl](https://github.com/crypto-rb/rbnacl)
