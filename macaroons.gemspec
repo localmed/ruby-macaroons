@@ -17,12 +17,11 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
   spec.required_ruby_version = ">= 2.2.6"
   spec.add_dependency "multi_json", "~> 1.10"
-  spec.add_dependency "rbnacl", "~> 5.0"
-  spec.add_dependency "rbnacl-libsodium", "~> 1.0"
+  spec.add_dependency "rbnacl", "~> 6.0"
 
   spec.add_development_dependency "bundler", "> 1.3"
   spec.add_development_dependency "rake"
-  spec.add_development_dependency "rspec",   "~> 3.6.0"
+  spec.add_development_dependency "rspec",   "~> 3.8.0"
   spec.add_development_dependency "pry"
   spec.add_development_dependency "pry-stack_explorer"
   spec.add_development_dependency "rspec_junit_formatter"
